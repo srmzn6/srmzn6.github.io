@@ -1,0 +1,43 @@
+---
+layout: post
+title: Android on Nook Color - Quick, easy and always works  !
+date: 2011-11-04 15:38:23.000000000 -04:00
+type: post
+published: true
+status: publish
+categories:
+- Hacking
+- Nook
+- Technology
+tags:
+- Android
+- Nook Color
+meta:
+  _edit_last: '1'
+---
+<p><a href="http://sandeepmore.com/blog/wp-content/uploads/2011/11/NookColorAndroidCM7.jpg"><img class="size-medium wp-image-298" title="Android CM7 on Nook Color  " src="{{ site.baseurl }}/assets/NookColorAndroidCM7-e1320446028755.jpg" alt="" width="200" height="126" /></a></p>
+<p><strong>S</strong>o, if you are having problems installing <a title="Cyanogenmod" href="http://www.cyanogenmod.com/devices/nook-color" target="_blank">Cyanogenmod 7</a> for Nook Color on a MicroSD card you are not alone. I was in the same boat, the MicroSD card I used was Transcend 32 GB Class 4, as it turns out make of the card does matter. Fortunately though I had a 2 GB Sandisk SD card laying around gathering dust, so I decided to put it to use.</p>
+<p>I followed these <a href="http://quinxy.com/2011/04/01/complete-guide-to-installing-configuring-cyanogenmod-7-rc4-android-2-3-gingerbread-on-the-nook-color/" target="_blank">instructions </a>to install Android on a Micro SD card for my Nook Color, it worked for Sandisk but not for my Transcend Micro SD card. I got a whole bunch of IO errors with Transcend while installing. The problem is with the SD card, and as it turns out  not all SD cards are the same and some are evil.</p>
+<p>For all of you, those who want an easy and workable solution, you can download the gunziped image file <a title="Nook 2GB Image" href="http://dl.dropbox.com/u/45981760/NOOK_CM7_2GB_IMAGE.img.tar.gz" target="_blank">here</a> (~250 MB) that I created. MD5 checksum is <strong>7b2c46113f4e9baa73c61b1f5d98a78b</strong> (if you care).</p>
+<p>Extract it (type <strong>tar -zxvf file.tar.gz</strong>) and burn it to your new SD card. Following are the things you need.</p>
+<ol>
+<li>A 2 GB MicroSD card (or greater)</li>
+<li>A program to burn the image to your MicroSD card, like <a href="http://launchpad.net/win32-image-writer/0.1/0.1/+download/win32diskimager-RELEASE-0.1-r15-win32.zip" target="_blank">Win32DiskImager </a>or 'dd' for Mac and Linux.</li>
+<li>If your MicroSD  card is more than 2 GB then you will need a utility program like GParted (Ubuntu) to expand the 1 GB Nook SD card partition space to the unallocated space (sorry if it sounds complicated but its really simple I promise !).</li>
+</ol>
+<p>I will describing the steps for Mac, for Windows it should be easy using Win32DiskImager, if you have any trouble just ask me in the comments and I will try to address it.</p>
+<ol>
+<li>Plug in the MicroSD card in your Mac.</li>
+<li>In the terminal (Terminal.app) type 'diskutil list'<br />
+this will list all the mounted drives on your machine, identify your SD card using the storage space and/or the file system. This step is critical, make sure you know the correct path to your MicroSD card.</li>
+<li>Unmount the MicroSD card using the following command 'diskutil unmount /dev/disk#' where # is the number of your Micro SD card volume.</li>
+<li>Run the command [codesyntax lang="bash" lines="no" container="none" capitalize="no" strict="yes" doclinks="0"] dd if='complete_path_to_Image.img' of='/dev/disk#' conv=noerror </li>
+</ol>
+<p>After the command is done running (which can take a while !) you will see two volumes mounted on your machine:</p>
+<ul>
+<li>boot and</li>
+<li>SD Card</li>
+</ul>
+<p>You are all set, if you have a SD card more than 2 GB you can use GParted (Ubuntu utility program) to accomodate the unallocated space into the SD Card space.<br />
+<span style="text-decoration: underline;">Hint: if the new partition exceeds 4GB use fat 32 ! by default the partitions are fat 16.</span></p>
+<p>Have fun with your new Nook Color Tablet</p>

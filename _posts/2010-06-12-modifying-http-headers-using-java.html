@@ -1,0 +1,128 @@
+---
+layout: post
+title: Modifying HTTP headers using Java
+date: 2010-06-12 18:00:13.000000000 -04:00
+type: post
+published: true
+status: publish
+categories:
+- Technology
+tags:
+- Coding
+- HTTP
+- Java
+meta:
+  _edit_last: '1'
+  _thumbnail_id: '216'
+---
+<p>There can be times when you are asked to do the impossible, thats  what we do as developers, we are super-humans and our kryptonite is  caffeine.</p>
+<p>Recently, I came across a project in which I was supposed to modify  the <strong>Http</strong> <strong>headers</strong> of the request going to a different server. Like a superhuman, I  thought it was a piece of cake; But after a lot of brainstorming,  brute-forcing and caffeine intake I realized it wasn’t that simple.  In-fact it was not possible at all. Now, before you folks get mad and  swear at me,  let me explain you the problem and how I tried to solve  it, how miserably I failed and  finally how I got around it by a simple  trick.</p>
+<p><strong>Problem:</strong><br />
+Let us start with the problem. What I had to do was simple, upon a user  event (assume a mouse click) I needed to calculate a value and insert it  into the header of a new request. Note the ‘new request’ here. This new  request is not on the same server but on a different server where I  have very little control.</p>
+<p><strong>Conclusion:</strong><br />
+I spent considerable amount of time working on this problem, if only I  knew the simple answer to the question, it would have saved me so much  of time. The answer was simply you cannot do it ! you cannot change the <strong>headers</strong> of the request which is redirected to a different server.</p>
+<p><strong>But why ?</strong><br />
+The reason is that if you were able to modify the <strong>headers</strong> you could  intercept the user requests in what ever way you want. There would be a  high probability of man-in-the-middle attack. One of the many ingenious  way of Java to protect you.</p>
+<p><strong>Workaround:</strong><br />
+The work around was to encrypt the information in the url and send it,  or use a form or hidden field.</p>
+<p><strong>Using HttpServletRequestWrapper class:</strong><br />
+If you want to modify the <strong>headers</strong> of the request which is on the same  server then it can be done by overriding the  getHeaderName and  getHeader of the HttpServletRequestWrapper class. Now, if you are  curious like me you might ask why on the earth do I want to use a  wrapper class ? Why cannot I simply use a filter to modify the <strong>headers</strong>.  As it appears, when you redirect or for that matter forward a request  your <strong>headers</strong> are committed and the stream is closed  by using the  HttpServletRequestWrapper class you can tell the servlet to stand by  before committing the response so that we can modify the <strong>headers</strong>.  Enough of theory lets gets some coding done.</p>
+<p>In the rest of the <strong>blog</strong> I will explain how to modify the <strong>headers</strong> by overriding  the HttpServletRequestWrapper class.</p>
+<p><a href="http://sandeepmore.com/blog/wp-content/uploads/2010/06/ModifyHttpHeaders-1.png"><img class="aligncenter size-medium wp-image-216" title="ModifyHttpHeaders-1" src="{{ site.baseurl }}/assets/ModifyHttpHeaders-1-300x103.png" alt="" width="300" height="103" /></a></p>
+<p><strong>Assumptions</strong><br />
+Here, I am assuming you are familiar with the basics of J2EE filter and  have already set up one for testing this example. <a href="http://www.di.unipi.it/%7Eghelli/didattica/bdl/A97329_03/web.902/a95878/filters.htm">Filter  example</a> is a good filter example to start with.</p>
+<p>Once you have set up a filter, lets call it MyFilterExample, it  should look pretty much like the following code.</p>
+
+<pre>package com.sandeepmore.filters;
+
+import java.io.IOException;
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+import javax.servlet.http.HttpSession;
+
+import java.util.logging.*;
+
+public class MyFilterExample implements javax.servlet.Filter {
+private ServletContext servletContext;
+private Logger log;
+
+public MyFilterExample(){
+super();
+}
+
+public void init(FilterConfig filterConfig) throws ServletException {
+servletContext = filterConfig.getServletContext();
+log = Logger.getLogger(MyFilter.class.getName());
+}
+
+public void doFilter( ServletRequest req,
+ServletResponse res,
+FilterChain filterChain)
+throws IOException, ServletException {
+
+MyServletRequestWrapper httpReq = new MyServletRequestWrapper((HttpServletRequest)req);
+HttpServletResponse httpRes = (HttpServletResponse)res;
+
+HttpSession session = httpReq.getSession();
+
+httpReq.addHeader("myHeader", "value");
+
+filterChain.doFilter(httpReq, httpRes);
+
+}
+
+public void destroy(){
+}
+}</pre>
+
+
+<p>As you can see we have added our custom <strong>headers</strong> using the line<br />
+<code>httpReq.addHeader("myheader", "value");</code></p>
+<p>The entire meat is in the method doFilter(). In the above class this  is the only method which needs to be modified as shown above. All we did  in this method is wrapped the <strong>http</strong> request object with the  MyServletRequestWrapper class (which we are about to see in a while) so  that we can override the getHeaderName and getHeader methods and insert  our custom <strong>headers</strong>. Code for MyServletRequestWrapper class is as follows</p>
+<p>&nbsp;</p>
+
+<pre>package myfilter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+import java.util.*;
+
+public class MyServletRequestWrapper extends HttpServletRequestWrapper{
+
+private Map headerMap;
+
+public void addHeader(String name, String value){
+headerMap.put(name, new String(value));
+}
+
+public MyServletRequestWrapper(HttpServletRequest request){
+super(request);
+headerMap = new HashMap();
+}
+
+public Enumeration getHeaderNames(){
+HttpServletRequest request = (HttpServletRequest)getRequest();
+List list = new ArrayList();
+for( Enumeration e = request.getHeaderNames() ;  e.hasMoreElements() ; )
+list.add(e.nextElement().toString());
+for( Iterator i = headerMap.keySet().iterator() ; i.hasNext() ; ){
+list.add(i.next());
+}
+return Collections.enumeration(list);
+}
+public String getHeader(String name){
+Object value;
+if((value = headerMap.get(""+name)) != null)
+return value.toString();
+else
+return ((HttpServletRequest)getRequest()).getHeader(name);
+}
+}
+</pre>
+<p>All this class does is that it adds the new header and the value  associated with it to a Hashmap, ‘headerMap’ in our case. When the  getHeaderNames method is called the new <strong>headers</strong> are inserted into a  ArrayList and returned as a Enumeration.</p>
+<p>The getHeader method searches for the header value in Hashmap  ‘headerMap’ first then it checks the HttpServletRequest object for the  header information.</p>
+<p>This is a very simple trick and can be very handy. Again, one  important thing to remember this method is useful only if you are  forwarding a request on the same server and not ‘redirecting’ to a  different server.</p>
+<p>Happy Coding<br />
+/srm</p>

@@ -1,0 +1,44 @@
+---
+layout: post
+title: SVN Repository Visualization Tool
+date: 2011-01-12 14:58:50.000000000 -05:00
+type: post
+published: true
+status: publish
+categories:
+- Coding
+- Technology
+tags:
+- Gource
+- SVN
+- visualization tool
+meta:
+  _wp_old_slug: ''
+  _edit_last: '1'
+---
+<p style="text-align: center;">&nbsp;</p>
+<p><a href="http://sandeepmore.com/blog/wp-content/uploads/2011/01/Capture2.jpg"><img class="aligncenter size-medium wp-image-198" title="Capture2" src="{{ site.baseurl }}/assets/Capture2-291x300.jpg" alt="Snapshot of Repository" width="291" height="300" /></a></p>
+<p>I love graphs and charts ( not the ones used by the MBA people) and was looking for a tool which could give me a snapshot or a timeline of the events for our repository we use at my work. My search ended when I stumbled upon a tool called <a href="http://code.google.com/p/gource/" target="_blank">Gource </a>while browsing <a href="http://www.sparkfun.com/" target="_blank">sparkfun.com</a>.<br />
+Let me admit one thing this tool is the coolest I every played with and its awesomeness brought me on my knees. Basically <a href="http://code.google.com/p/gource/" target="_blank">Gource </a>is a open source software version control visualization tool for linux, Mac and Windows. It works best with Git but then there are some cool folks (<a href="http://bitshifter.wordpress.com" target="_blank">Bitshifter</a>)<br />
+who have written python script to make Gource work with SVN.<br />
+following are the steps to use Gource with SVN on windows, I am documenting them so that I don't forget them:<br />
+You need</p>
+<ol>
+<li>Gource <a href="http://code.google.com/p/gource/downloads/list" target="_blank">download</a></li>
+<li>Python (2.5 or later) <a href="http://www.python.org/download/" target="_blank">download</a></li>
+<li><a href="http://www.python.org/download/" target="_blank"></a><a href="http://gource.googlecode.com/files/svn-gource-1.2.tar.gz" target="_blank">svn-gource.py</a></li>
+</ol>
+<p>Unzip and install Gource and Python.<br />
+Go to your SVN trunk (or branch) - <em>my-svn-project</em>.</p>
+<div id="_mcePaste" style="padding-left: 30px;"><em>cd my-svn-project</em></div>
+<p>Get SVN log</p>
+<div id="_mcePaste" style="padding-left: 30px;"><em>svn log --verbose --xml &gt; my-project.log</em></div>
+<p>Run the python script to convert svn logs to Gource friendly log</p>
+<div id="_mcePaste" style="padding-left: 30px;"><em>python svn-gource.py --filter-dirs my-project.log &gt; my-project-gource.log</em></div>
+<p>Display the results</p>
+<div id="_mcePaste" style="padding-left: 30px;"><em>gource --log-format custom my-project-gource.log</em></div>
+<div style="padding-left: 30px;"><em><br />
+</em></div>
+<p>By default the display speed is 10 seconds per day, you can speed it up by using the option <em>-s</em> (e.g 0.1 is faster, 100 is slower)</p>
+<p>e.g.</p>
+<div id="_mcePaste" style="padding-left: 30px;"><em>gource -s 0.1 --log-format custom my-project-gource.log</em></div>

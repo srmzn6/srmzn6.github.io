@@ -1,0 +1,47 @@
+---
+layout: post
+title: Pooling framework for Memcached
+date: 2011-05-16 14:55:25.000000000 -04:00
+type: post
+published: true
+status: publish
+categories:
+- Coding
+- Technology
+tags:
+- Memcached
+- Pooling Memcached
+meta:
+  _edit_last: '1'
+  _thumbnail_id: '274'
+---
+<p>Since a long time I wanted a pooling framework for Memcached API, so I decided to build one. Its fairly straight forward to use and modify, you can get the source code from my <a href="https://github.com/moresandeep/P4M" target="_blank">Git repository</a>.</p>
+<p>Following are the steps to get it up and running.</p>
+<ol>
+<li>Import the project in Eclipse</li>
+<li>Add the following jars to the project as they are needed for the project to compile
+<ol>
+<li>commons-logging.jar  (http://commons.apache.org/logging/download_logging.cgi)</li>
+<li>commons-pool-1.5.6.jar   (http://commons.apache.org/pool/download_pool.cgi)</li>
+<li>junit.jar     (http://sourceforge.net/projects/junit/)</li>
+<li>memcached-2.5.jar   (http://code.google.com/p/spymemcached/downloads/list)</li>
+</ol>
+</li>
+<li>I have included JUnit test, just in case !</li>
+<li>The settings to connect to the Membase/Memcache server are in the pooling.properties file (memcached.server)</li>
+<li>Pool size can be set in the same file (memcached.poolObjects)</li>
+<li>API currently implements SET,GET and DELETE methods, feel free to extend it and let me know, I will be more than happy to update the code.</li>
+</ol>
+<p><strong>Usage:</strong></p>
+
+<pre><strong>	private CachingBroker cb = new CachingBroker();
+
+	cb.set("key" ,TTL, "value");   // set
+	cb.get("key");                     // get
+	cb.delete("key");	        // delete</strong></pre>
+
+</strong></p>
+<p>&nbsp;</p>
+
+<p>Happy Coding<br />
+/srm</p>

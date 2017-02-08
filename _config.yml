@@ -1,0 +1,50 @@
+# Built with Jekyll 3.2.0
+
+# Setup
+title:               Sandeep More
+#tagline:             ' ∴ I am'
+description:         'Musings of a programmer'
+url:                 'http://sandeepmore.com'
+baseurl:             '/www'
+
+# About/contact
+author:
+  name:              Sandeep More
+  url:               https://twitter.com/moresandeep
+  email:             
+
+# Permalinks
+
+permalink: pretty
+permalink: /blog/:title/
+
+# Set encoding to UTF-8
+encoding: utf-8
+
+# Collections for texts
+collections:
+  texts:
+    output: true
+
+# Markdown specs
+markdown: kramdown
+
+kramdown:
+  auto_ids:       true
+  footnote_nr:    1
+  entity_output:  as_char
+  footnote_backlink: "&#x21a9;&#xfe0e;"
+  toc_levels:     1..6
+  smart_quotes:   lsquo,rsquo,ldquo,rdquo
+  enable_coderay: false
+
+# Custom vars
+version:             0.0.6
+
+# Exclusions from the final site
+exclude: [optional, vendor]
+
+twitter_username: moresandeep
+github_username:  moresandeep
+
+
