@@ -5,7 +5,7 @@ title:               Sandeep More
 #tagline:             ' ∴ I am'
 description:         'Musings of a programmer'
 url:                 'http://sandeepmore.com'
-baseurl:             '/www'
+baseurl:             ''
 
 # About/contact
 author:
