@@ -16,7 +16,7 @@ author:
 # Permalinks
 
 permalink: pretty
-permalink: /blog/:title/
+permalink: /blog/:year/:month/:day/:title/
 
 # Set encoding to UTF-8
 encoding: utf-8
