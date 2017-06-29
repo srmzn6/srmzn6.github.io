@@ -1,0 +1,174 @@
+---
+layout: post
+title: Securing Raspberry Pi Security Camera (or UIs) using Apache Knox
+date: 2017-06-28 
+type: post
+published: true
+status: publish
+comments: true
+categories:
+- Technology
+- Raspberri Pi
+- Security
+- Apache Knox
+tags:
+- Technology
+- Raspberri Pi
+- Security
+- Apache Knox
+meta:
+---
+
+<br/>
+<p>
+I was able to get my hands on the <a href="https://www.raspberrypi.org/blog/raspberry-pi-zero-w-joins-family/">Raspberry Pi Zero W</a> and decided to put it to use by building a motion activated security camera. I had three simple requirements:
+<ul> 
+<li> The camera should have a live feed. </li>
+<li> It should alert me (email/text) when motion is detected. </li>
+<li> It should be secure. </li>
+</ul>
+
+</p>
+
+<p>
+I stumbeled on a great tutorial by Mark West, <a href="https://www.bouvet.no/bouvet-deler/utbrudd/building-a-motion-activated-security-camera-with-the-raspberry-pi-zero">Building a Motion Activated Security Camera with Raspberry Pi Zero</a>. 
+By following the tuorial, I was able to achieve two of my requirements and I was somewhat happy about my setup. There were however some things 
+that I thought needed to be worked out:
+<ul>
+<li> Security </li>
+<li> Network Layout </li>
+<li> Image Detection enhancements </li>
+</ul>
+
+</p>
+
+<p>
+In this blog post I will cover Securing Raspberry Pi Motion Web Interface using Opensource tool called <a href="http://knox.apache.org/">Apache Knox</a> (disclamer: I am a committer for Apache Knox project) 
+</p>
+
+<p>
+I am assuming that <a href="https://motion-project.github.io/">Motion</a> is configure to get live feeds from Raspberry Pi camera module, I will not go into the details as they are covered in detail by Mark West in his excellent blog post mentioned above. It should be noted that any Web Interface can be secured using Apache Knox, I am using <a href="https://motion-project.github.io/">Motion</a> as an example here.
+</p>
+
+<hr/>
+<h2> Why Apache Knox ? </h2>
+
+<ul>
+<li> Authentication: Authenticates the users. </li>
+<li> Authorization: Make access decisions i.e. which services are accessible for which user. </li>
+<li> Audit: Gives the ability to determine what actions were taken by whom during some period of time. </li>
+<li> SSL </li>
+<li> Lightweight: Has low memory and disk requirement. </li>
+</ul>
+
+<hr/>
+<h2> Setup <strong>user</strong> and <strong>hostname</strong> </h2>
+<p>
+We will create a seperate user for authentication. This user will be created on the system where Apache Knox is installed. Apache Knox uses this user for authentication and access control (using  <a href="http://knox.apache.org/books/knox-0-12-0/user-guide.html#PAM+based+Authentication">PAM</a>) so it makes sense to keep it seperate from other system users. We will use this user exclusively to access our Motion setup from outside.
+</p>
+
+<p>
+Setting up user with username - <em>myuser</em> and password - <em>strongpassword</em>
+<br/>
+<code>sudo useradd -m myuser -G sudo</code><br/>
+<code>sudo passwd strongpassword</code><br/>
+</br>
+Add user to shadow group</br>
+<code>sudo usermod -a -G shadow myuser</code></br>
+</p>
+
+<p>
+Update hostname so that in multiple node deployments each raspberry pi can be accessed, choose a hostname you like and update
+in these files
+
+<pre>
+# update here
+sudo nano /etc/hosts
+sudo nano /etc/hostname
+</pre>
+
+<pre>
+# commit changes
+sudo /etc/init.d/hostname.sh
+sudo reboot
+</pre>
+</p>
+
+<hr/>
+<h2> Setup Apache Knox </h2>
+<p>
+Download Apache Knox </br>
+<code>wget http://www-eu.apache.org/dist/knox/0.12.0/knox-0.12.0.zip </code></br>
+</br>
+Unzip it to /knox directory </br>
+<code>unzip knox-0.12.0.zip -d /knox</code></br>
+</br>
+
+Create a link to PAM library under <em>/knox/ext/native</em> </br>
+<code>cd /knox/ext/native</code></br>
+<code>sudo ln -s /lib/arm-linux-gnueabihf/libpam.so.0.83.1 libpam.so</code></br>
+</br>
+Check gateway.sh</br>
+<code>nano /knox/bin/gateway.sh</code></br>
+
+Make sure the APP_JAVA_LIB_PATH parameter is correctly set </br>
+<code>APP_JAVA_LIB_PATH="-Djava.library.path=$APP_HOME_DIR/ext/native"</code></br>
+</br>
+
+Optional: Update gateway port from default 8443 to something else in <em> /knox/conf/gateway-site.xml </em>
+</p>
+
+<h3><u> Update Knox config files </u><h3>
+<p>
+Now we update the knox topology file (sandbox.xml) to use PAM authentication, for Motion running locally on port 8081. </br>
+replace <code>/knox/conf/sandbox.xml</code> with <code>https://github.com/moresandeep/knox4motion/blob/master/conf/sandbox.xml</code></br>
+</br>
+Note: Update the user (<em>myuser</em>) in authorization provider in <em>sandbox.xml</em> file
+<pre>
+  &lt;provider&gt;
+    &lt;role&gt;authorization&lt;/role&gt;
+    &lt;name&gt;AclsAuthz&lt;/name&gt;
+    &lt;enabled&gt;true&lt;/enabled&gt;
+    &lt;param&gt;
+        &lt;name&gt;motion.acl&lt;/name&gt;
+  		  &lt;!-- if you have a different user update here --&gt;
+        &lt;value&gt;myuser;*;*&lt;/value&gt;
+    &lt;/param&gt;
+  &lt;/provider&gt;
+</pre>
+
+
+<p>
+If Motion is running on another machine then update the following code snippet in <em>sandbox.xml</em> file with the 
+<em>hostname</em> and <em>port</em> where Motion is running.
+
+<pre>
+  &lt;service&gt;
+          &lt;role&gt;MOTION&lt;/role&gt;
+          &lt;url&gt;http://&lt;hostname&gt;:&lt;port&gt;&lt;/url&gt;
+  &lt;/service&gt;
+</pre>
+</p>
+</br>
+Under <em>/knox/data/services</em> create a folder structure as follows
+</br>
+<code>/knox/data/services/motion/0.0.1/</code></br>
+</br>
+
+Copy <em>rewrite.xml</em> and <em>service.xml</em> files from <code>https://github.com/moresandeep/knox4motion/blob/master/services/motion/0.0.1/</code>
+to <code>/knox/data/services/motion/0.0.1/</code></br>
+</p>
+
+<hr/>
+<h2> Start Apache Knox </h2>
+To start apache knox run the folowing command</br>
+<code>/knox/bin/gateway.sh start</code></br>
+</br>
+
+You can access Knox at 
+<code> https://&lt;knox-host&gt:8443/gateway/sandbox/ </code></br>
+</br>
+
+Find the relevant Knox logs in <code>/knox/logs/</code> directory.</br>
+</br>
+
