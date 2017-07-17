@@ -71,7 +71,7 @@ We will create a seperate user for authentication. This user will be created on 
 Setting up user with username - <em>myuser</em> and password - <em>strongpassword</em>
 <br/>
 <code>sudo useradd -m myuser -G sudo</code><br/>
-<code>sudo passwd strongpassword</code><br/>
+<code>sudo passwd myuser</code><br/>
 </br>
 Add user to shadow group</br>
 <code>sudo usermod -a -G shadow myuser</code></br>
@@ -105,11 +105,11 @@ Unzip it to /knox directory </br>
 </br>
 
 Create a link to PAM library under <em>/knox/ext/native</em> </br>
-<code>cd /knox/ext/native</code></br>
+<code>cd /knox/knox-0.12.0/ext/native</code></br>
 <code>sudo ln -s /lib/arm-linux-gnueabihf/libpam.so.0.83.1 libpam.so</code></br>
 </br>
 Check gateway.sh</br>
-<code>nano /knox/bin/gateway.sh</code></br>
+<code>nano /knox/knox-0.12.0/bin/gateway.sh</code></br>
 
 Make sure the APP_JAVA_LIB_PATH parameter is correctly set </br>
 <code>APP_JAVA_LIB_PATH="-Djava.library.path=$APP_HOME_DIR/ext/native"</code></br>
@@ -121,7 +121,7 @@ Optional: Update gateway port from default 8443 to something else in <em> /knox/
 <h3><u> Update Knox config files </u><h3>
 <p>
 Now we update the knox topology file (sandbox.xml) to use PAM authentication, for Motion running locally on port 8081. </br>
-replace <code>/knox/conf/sandbox.xml</code> with <code>https://github.com/moresandeep/knox4motion/blob/master/conf/sandbox.xml</code></br>
+replace <code>/knox/knox-0.12.0/conf/topologies/sandbox.xml</code> with <code>https://github.com/moresandeep/knox4motion/blob/master/conf/sandbox.xml</code></br>
 </br>
 Note: Update the user (<em>myuser</em>) in authorization provider in <em>sandbox.xml</em> file
 <pre>
@@ -150,14 +150,23 @@ If Motion is running on another machine then update the following code snippet i
 </pre>
 </p>
 </br>
-Under <em>/knox/data/services</em> create a folder structure as follows
+Under <em>/knox/knox-0.12.0/data/services</em> create a folder structure as follows
 </br>
-<code>/knox/data/services/motion/0.0.1/</code></br>
+<code>/knox/knox-0.12.0/data/services/motion/0.0.1/</code></br>
 </br>
 
 Copy <em>rewrite.xml</em> and <em>service.xml</em> files from <code>https://github.com/moresandeep/knox4motion/blob/master/services/motion/0.0.1/</code>
 to <code>/knox/data/services/motion/0.0.1/</code></br>
 </p>
+
+i.e.
+</br>
+<code>wget https://raw.githubusercontent.com/moresandeep/knox4motion/master/services/motion/0.0.1/rewrite.xml</code>
+</br>
+
+</br>
+<code>wget https://raw.githubusercontent.com/moresandeep/knox4motion/master/services/motion/0.0.1/service.xml</code>
+</br>
 
 <hr/>
 <h2> Start Apache Knox </h2>
