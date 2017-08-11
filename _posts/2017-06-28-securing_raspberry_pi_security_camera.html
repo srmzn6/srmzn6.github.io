@@ -118,7 +118,7 @@ Make sure the APP_JAVA_LIB_PATH parameter is correctly set </br>
 Optional: Update gateway port from default 8443 to something else in <em> /knox/conf/gateway-site.xml </em>
 </p>
 
-<h3><u> Update Knox config files </u><h3>
+<h3><b> Update Knox config files </b><h3>
 <p>
 Now we update the knox topology file (sandbox.xml) to use PAM authentication, for Motion running locally on port 8081. </br>
 replace <code>/knox/knox-0.12.0/conf/topologies/sandbox.xml</code> with <code>https://github.com/moresandeep/knox4motion/blob/master/conf/sandbox.xml</code></br>
@@ -168,10 +168,52 @@ i.e.
 <code>wget https://raw.githubusercontent.com/moresandeep/knox4motion/master/services/motion/0.0.1/service.xml</code>
 </br>
 
+<h3><b> Install Java (might not be needed) </b><h3>
+Check whether you already have java installed by typing <code>java -version</code> if you see something like the following output
+</br>
+<pre>
+java version "1.8.0_121"
+Java(TM) SE Runtime Environment (build 1.8.0_121-b13)
+Java HotSpot(TM) 64-Bit Server VM (build 25.121-b13, mixed mode)
+</pre>  
+
+Then you need not install Java, else run the following command to install Oracle Java 8
+
+</br>
+<code>sudo apt-get update && sudo apt-get install oracle-java8-jdk</code>
+</br>
+
+<h3><b> Make Knox scripts executable </b><h3>
+
+</br>
+<code>sudo chmod +x /knox/knox-0.12.0/bin/gateway.sh</code>
+</br>
+
+<br>
+<code>sudo chmod +x /knox/knox-0.12.0/bin/knoxcli.sh</code>
+</br>
+
+<h3><b> Create Knox master secret </b><h3>
+</br>
+  <code>/knox/knox-0.12.0/bin/knoxcli.sh create-master </code>
+</br>
+
+If you are having permissions issues writing to the security directory you can update the permissions as follows
+
+</br>
+<code> sudo chmod -R g=+rwx /knox/knox-0.12.0/bin/../data/security/ </code>
+</br>
+
 <hr/>
 <h2> Start Apache Knox </h2>
 To start apache knox run the folowing command</br>
-<code>/knox/bin/gateway.sh start</code></br>
+<code>/knox/knox-0.12.0/bin/gateway.sh start</code></br>
+</br>
+
+<b>Note:</b> Knox should not be run as root ! if you are having issues with permissions starting knox you can update them as follows
+
+</br>
+<code> sudo chown -R root:users /knox/knox-0.12.0/ </code>
 </br>
 
 You can access Knox at 
