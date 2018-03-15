@@ -1,7 +1,7 @@
 # Built with Jekyll 3.2.0
 
 # Setup
-title:               Sandeep More
+title:               Sandeep Moré
 #tagline:             ' ∴ I am'
 description:         '∴ I am'
 url:                 'http://sandeepmore.com'
@@ -9,7 +9,7 @@ baseurl:             ''
 
 # About/contact
 author:
-  name:              Sandeep More
+  name:              Sandeep Moré
   url:               https://twitter.com/moresandeep
   email:             
 
