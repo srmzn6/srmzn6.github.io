@@ -1,0 +1,25 @@
+{
+  "list": [
+    {
+      "name":"Apache Knox",
+      "url":"https://knox.apache.org/",
+      "desc":"Apache Knox Gateway is a REST API Gateway for interacting with Apache Hadoop clusters."
+    },
+    {
+      "name":"Apache Orc",
+      "url":"https://orc.apache.org/",
+      "desc":"Apache Orc is a self-describing type-aware columnar file format designed for Hadoop workloads."
+    },
+    {
+      "name":"Pooling framework for Memcached API",
+      "url":"https://github.com/moresandeep/P4M",
+      "desc":"A pooling framework for Memcached API because developers should focus on the functionality and not the boilerplate code."
+    },
+    {
+      "name":"Memcached Session Manager",
+      "url":"https://github.com/magro/memcached-session-manager",
+      "desc":"A tomcat session manager that backups sessions in memcached and pulls them from there if asked for unknown sessions."
+    }
+  ]
+}
+
